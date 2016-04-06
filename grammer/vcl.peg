@@ -16,7 +16,7 @@ BackendDefinition
  = "backend" _ (name:[a-z]+) _ "{" _ props:(SetBackendProperty _)+ "}" { return {type:'BackendDeclaration', name:name.join(''), properties:props.map(p => p[0])} }
 
 SetBackendProperty
- = (left:BackendPropertyName _ "=" _ right:PropertyValue ";") {return {type:'SetBackendProperty', name:left, value:right} }
+ = (left:BackendPropertyName _ "=" _ right:PropertyValue ";") {return {name:left, value:right} }
 
 BackendPropertyName "backend property name"
   = name:("."[a-z_]*) {return name[1].join('')}
