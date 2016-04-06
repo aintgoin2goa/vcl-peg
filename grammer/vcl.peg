@@ -1,0 +1,25 @@
+{
+  function durationUnit(u){
+  	switch(u){
+  		case 's' : return 'seconds';
+  	}
+  }
+}
+
+start
+  = (expr:Expression _)* {return expr; }
+
+Expression
+  = SetBackendProperty
+
+SetBackendProperty
+ = (left:BackendPropertyName _ "=" _ right:Duration ";") {return {type:'SetBackendProperty', name:left, value:right} }
+
+BackendPropertyName "backend property name"
+  = name:("."[a-z_]*) {return name[1].join('')}
+
+Duration "duration"
+  = a:[0-9]+u:[a-z] {return {type:'duration', amount:parseInt(a.join(''),10), unit:durationUnit(u)}}
+
+_ "whitespace"
+  = [ \t\n\r]*

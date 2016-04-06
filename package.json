@@ -1,0 +1,22 @@
+{
+  "name": "vcl-peg",
+  "version": "1.0.0",
+  "description": "Attempt to learn PEG",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aintgoin2goa/vcl-peg.git"
+  },
+  "author": "paul.wilson66@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aintgoin2goa/vcl-peg/issues"
+  },
+  "homepage": "https://github.com/aintgoin2goa/vcl-peg#readme",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "pegjs": "^0.9.0"
+  },
+  "devDependencies": {
+    "minimist": "^1.2.0"
+  }
+}
