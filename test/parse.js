@@ -4,6 +4,7 @@ const path = require('path');
 const argv = require('minimist')(process.argv.slice(2));
 const parser = require('../parsers/' + (argv.p || argv.parser));
 const colors = require('colors');
+const util = require('util');
 
 let src = fs.readFileSync(path.resolve(__dirname, '../', (argv.s || argv.src)), {encoding:'utf8'});
 let result;
@@ -21,5 +22,5 @@ try{
 }
 
 
-console.log(result);
+console.log(util.inspect(result, {depth:null}));
 

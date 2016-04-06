@@ -7,7 +7,7 @@
 }
 
 start
-  = (expr:Expression _)* {return expr; }
+  = expr:(Expression _ )+ {return expr.map(e => e[0]); }
 
 Expression
   = SetBackendProperty
