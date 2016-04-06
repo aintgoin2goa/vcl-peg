@@ -10,16 +10,33 @@ start
   = expr:(Expression _ )+ {return expr.map(e => e[0]); }
 
 Expression
-  = SetBackendProperty
+  = BackendDefinition
+
+BackendDefinition
+ = "backend" _ (name:[a-z]+) _ "{" _ props:(SetBackendProperty _)+ "}" { return {type:'BackendDeclaration', name:name.join(''), properties:props.map(p => p[0])} }
 
 SetBackendProperty
- = (left:BackendPropertyName _ "=" _ right:Duration ";") {return {type:'SetBackendProperty', name:left, value:right} }
+ = (left:BackendPropertyName _ "=" _ right:PropertyValue ";") {return {type:'SetBackendProperty', name:left, value:right} }
 
 BackendPropertyName "backend property name"
   = name:("."[a-z_]*) {return name[1].join('')}
 
+PropertyValue "property value"
+  = value:(Duration / Integer / String / Boolean)
+
+Boolean "boolean"
+  = val:("true" / "false") {return {type:'boolean', value:(val === 'true'), unit:null }}
+
+String "string"
+  = '"' val:[^"]* '"' {return {type:'string', value:val.join(''), unit:null }}
+
 Duration "duration"
-  = a:[0-9]+u:[a-z] {return {type:'duration', amount:parseInt(a.join(''),10), unit:durationUnit(u)}}
+  = a:[0-9]+u:[a-z] {return {type:'duration', value:parseInt(a.join(''),10), unit:durationUnit(u)}}
+
+Integer "integer"
+  = int:[0-9]+ {return {type:'int', value:parseInt(int.join(''),10), unit:null}}
+
+
 
 _ "whitespace"
   = [ \t\n\r]*
