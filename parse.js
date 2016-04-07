@@ -24,7 +24,7 @@ function combineArgs(args){
 	return args.reduce((previous, current) => {
 		let val;
 		if(typeof current === 'object'){}
-		val = typeof current === 'object'  ? util.inspect(obj, null) : String(current);
+		val = typeof current === 'object'  ? util.inspect(current, {depth:null}) : String(current);
 		return previous + '\n' + val;
 	}, '');
 }
@@ -42,8 +42,10 @@ try{
 	result = parser.parse(src);
 	log.success(result);
 }catch(e){
-	if(e.name === 'SyntaxError'){
-		log.error(`Syntax Error! line ${e.location.from.line} column ${e.location.from.column}: ${e.message}`)
+	if(e.name === 'SyntaxError') {
+		log.error(`Syntax Error! line ${e.location.from.line} column ${e.location.from.column}: ${e.message}`);
+	}else if(e.name === 'GammarError'){
+		log.error(`${e.name} (${e.location}): ${e.message}`);
 	}else{
 		log.error(e.name, e.stack);
 	}

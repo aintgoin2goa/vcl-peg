@@ -15,32 +15,30 @@ Expression
 BackendDefinition "backend"
  = "backend" _ (name:[a-z]+) _ (propList:BackendPropertyList) { return {type:'BackendDeclaration', name:name.join(''), properties:propList} }
 
-BackendHealthCheck "healthcheck"
- = ".probe" _ "{" _ props:(SetBackendProperty _)+ "}" {return {'name':'Healthcheck', properties:props.map(p => p[0])} }
 
 BackendPropertyList "backend property list"
- = "{" _ (props:SetBackendProperty _)+ "}" { return props.map(p => p[0]) }
+ = "{" _ props:(SetBackendProperty _)+ "}" { return props.map(p => p[0]) }
 
 SetBackendProperty "SET backend property"
- = (left:BackendPropertyName _ "=" _ right:PropertyValue ";") {return {name:left, value:right} }
+ = (left:BackendPropertyName _ "=" _ right:Literal ";") {return [left, right] }
 
 BackendPropertyName "backend property name"
   = name:("."[a-z_]*) {return name[1].join('')}
 
-PropertyValue "property value"
+Literal "literal"
   = value:(Duration / Integer / String / Boolean)
 
 Boolean "boolean"
-  = val:("true" / "false") {return {type:'boolean', value:(val === 'true'), unit:null }}
+  = val:("true" / "false") {return {type:'boolean', value:(val === 'true')}}
 
 String "string"
-  = '"' val:[^"]* '"' {return {type:'string', value:val.join(''), unit:null }}
+  = '"' val:[^"]* '"' {return {type:'string', value:val.join('')}}
 
 Duration "duration"
-  = a:[0-9]+u:[a-z] {return {type:'duration', value:parseInt(a.join(''),10), unit:durationUnit(u)}}
+  = a:[0-9]+u:[a-z] {return {type:'duration', value:parseInt(a.join(''),10), unit:u}}
 
 Integer "integer"
-  = int:[0-9]+ {return {type:'int', value:parseInt(int.join(''),10), unit:null}}
+  = int:[0-9]+ {return {type:'int', value:parseInt(int.join(''),10)}}
 
 _ "whitespace"
   = [ \t\n\r]*
