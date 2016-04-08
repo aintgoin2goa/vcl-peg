@@ -13,7 +13,7 @@ Expression
   =  BackendDefinition
 
 BackendDefinition "backend"
- = "backend" _ (name:[a-z]+) _ (propList:(BackendPropertyList / HealthCheck)) { return ['Backend', {name:name.join(''), properties:propList}] }
+ = "backend" _ name:Identifier _ props:BackendPropertyList { return ['Backend', {name:name[1], properties:props}] }
 
 BackendPropertyList "backend property list"
  = "{" _ props:((SetBackendProperty / HealthCheck) _)+ "}" { return props.map(p => p[0]) }
@@ -28,7 +28,7 @@ BackendPropertyName "backend property name"
   = name:("."[a-z_]*) {return name[1].join('')}
 
 Identifier "identifier"
-  = i:([a-zA-Z] / "-" / "_" / ".")+ {return ['Identifier', i.join('')]; }
+  = i:([a-zA-Z0-9] / "-" / "_" / ".")+ {return ['Identifier', i.join('')]; }
 
 Literal "literal"
   = value:(Duration / Integer / String / Boolean )
