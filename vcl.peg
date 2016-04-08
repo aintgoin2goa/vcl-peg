@@ -1,44 +1,52 @@
 {
-  function durationUnit(u){
-  	switch(u){
-  		case 's' : return 'seconds';
-  	}
-  }
+	function isConcat(str){
+		if(str.length === 1) return str[0][0];
+
+		return ['StringConcatenation', str.map(s => s[0])];
+	}
 }
 
 start
   = expr:(Expression _ )+ {return expr.map(e => e[0]); }
 
 Expression
-  = BackendDefinition
+  =  BackendDefinition
 
 BackendDefinition "backend"
- = "backend" _ (name:[a-z]+) _ (propList:BackendPropertyList) { return {type:'BackendDeclaration', name:name.join(''), properties:propList} }
-
+ = "backend" _ (name:[a-z]+) _ (propList:(BackendPropertyList / HealthCheck)) { return ['Backend', {name:name.join(''), properties:propList}] }
 
 BackendPropertyList "backend property list"
- = "{" _ props:(SetBackendProperty _)+ "}" { return props.map(p => p[0]) }
+ = "{" _ props:((SetBackendProperty / HealthCheck) _)+ "}" { return props.map(p => p[0]) }
+
+HealthCheck "healthcheck"
+  = _ ".probe" _ "=" _ propList:BackendPropertyList {return ['Healthcheck', propList];}
 
 SetBackendProperty "SET backend property"
- = (left:BackendPropertyName _ "=" _ right:Literal ";") {return [left, right] }
+ = left:BackendPropertyName _ "=" _ right:Literal ";" {return ['SetBackendProperty', {name:left, value:right}]; }
 
 BackendPropertyName "backend property name"
   = name:("."[a-z_]*) {return name[1].join('')}
 
+Identifier "identifier"
+  = i:([a-zA-Z] / "-" / "_" / ".")+ {return ['Identifier', i.join('')]; }
+
 Literal "literal"
-  = value:(Duration / Integer / String / Boolean)
+  = value:(Duration / Integer / String / Boolean )
+
+String "String"
+  = str:((StringPart / Identifier) _? )+ {return isConcat(str);}
 
 Boolean "boolean"
-  = val:("true" / "false") {return {type:'boolean', value:(val === 'true')}}
+  = val:("true" / "false") {return ['Boolean', (val === 'true')]}
 
-String "string"
-  = '"' val:[^"]* '"' {return {type:'string', value:val.join('')}}
+StringPart "string"
+  = '"' val:[^"]* '"' {return ['String', val.join('')]}
 
 Duration "duration"
-  = a:[0-9]+u:[a-z] {return {type:'duration', value:parseInt(a.join(''),10), unit:u}}
+  = a:[0-9]+u:[a-z] {return ['Duration', parseInt(a,10), u]}
 
 Integer "integer"
-  = int:[0-9]+ {return {type:'int', value:parseInt(int.join(''),10)}}
+  = int:[0-9]+ {return ['Integer', parseInt(int.join(''),10)]}
 
 _ "whitespace"
   = [ \t\n\r]*

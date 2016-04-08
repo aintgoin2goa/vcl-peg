@@ -43,7 +43,7 @@ try{
 	log.success(result);
 }catch(e){
 	if(e.name === 'SyntaxError') {
-		log.error(`Syntax Error! line ${e.location.from.line} column ${e.location.from.column}: ${e.message}`);
+		log.error(`Syntax Error! line ${e.location.start.line} column ${e.location.start.column}: ${e.message}`);
 	}else if(e.name === 'GammarError'){
 		log.error(`${e.name} (${e.location}): ${e.message}`);
 	}else{
