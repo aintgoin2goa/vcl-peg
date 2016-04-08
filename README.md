@@ -1,4 +1,9 @@
 # vcl-peg
-Attempt to learn PEG
 
-If you're looking for a PEG for Varnish, don't use this - I'm trying to learn PEG and this will probably never work!
+**Very much a work-in-progress - don't use this yet!**
+
+A javascript parser, generated using pegjs for vcl as used in fastly.
+
+Currently it can only handle backend declarations so is not much use.
+
+
