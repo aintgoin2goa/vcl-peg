@@ -1,6 +1,6 @@
 {
   "name": "vcl-peg",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha1",
   "description": "Attempt to learn PEG",
   "repository": {
     "type": "git",
