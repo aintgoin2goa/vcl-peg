@@ -1,5 +1,5 @@
 {
-  "name": "vcl-peg",
+  "name": "vcl-parser",
   "version": "1.0.0-alpha1",
   "description": "Attempt to learn PEG",
   "repository": {

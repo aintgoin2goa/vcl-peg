@@ -6,8 +6,6 @@ const args = require('minimist')(process.argv.slice(2), {
 	default : {'backends' : false}
 });
 
-console.log(args);
-
 
 const colors = require('colors');
 const util = require('util');

@@ -1,34 +1,92 @@
 {
+	const util = require('util');
+
 	function isConcat(str){
 		if(str.length === 1) return str[0][0];
 
 		return ['StringConcatenation', str.map(s => s[0])];
 	}
+
+	function log(val){
+		console.log(util.inspect(val, {depth:null}));
+		return val;
+	}
+
+	function clean(arr){
+		return arr.filter(a => {
+			if(typeof a === 'object' && a.push){
+				return a.length > 0;
+			}
+
+			return !!a;
+		});
+	}
+
+	function logEach(val){
+		for(let v of val){
+			log('====');
+			log(val);
+		}
+		return val;
+	}
 }
 
 start
-  = expr:(Expression _ )+ {return expr.map(e => e[0]); }
+  = block:(Block _ )+ {return block.map(e => e[0]); }
 
-Expression
-  =  BackendDefinition
+Block
+  =  (BackendDefinition / Comment / Subroutine )
+
+
+/* ================ BLOCKS ==================== */
+
+Subroutine "function"
+  = _ "sub" _ name:Identifier _ "{" _ lines:Line*  _ "}" { return [name[1], lines[0]]; }
 
 BackendDefinition "backend"
  = "backend" _ name:Identifier _ props:BackendPropertyList { return ['Backend', {name:name[1], properties:props}] }
 
 BackendPropertyList "backend property list"
- = "{" _ props:((SetBackendProperty / HealthCheck) _)+ "}" { return props.map(p => p[0]) }
+ = "{" _ props:((SetBackendProperty / HealthCheck / Comment) _)+ "}" { return props.map(p => p[0]) }
 
 HealthCheck "healthcheck"
   = _ ".probe" _ "=" _ propList:BackendPropertyList {return ['Healthcheck', propList];}
+
+Comment "Comment"
+  = _ "#" c:[^\n]+ { return ['Comment', c.join('')]; }
+
+/* =============== STATEMENTS ================== */
+
+Line "Line"
+  = __ statements:(__ Statement __)* __ ";" {return clean(statements[0]); }
+
+Statement "Statement"
+  = statement:(GetHttpHeader / SetHttpHeader)
+
+GetHttpHeader "Get HTTP Header"
+  = header:HttpHeader
+
+SetHttpHeader "Set HTTP Header"
+  = "set" _ left:HttpHeader _ "=" _ right:(HttpHeader / String) {return ['SetHttpHeader', {name:left, value:right}]; }
 
 SetBackendProperty "SET backend property"
  = left:BackendPropertyName _ "=" _ right:Literal ";" {return ['SetBackendProperty', {name:left, value:right}]; }
 
 BackendPropertyName "backend property name"
-  = name:("."[a-z_]*) {return name[1].join('')}
+  = name:("." Identifier) {return name[1].join('')}
+
+/* ============= IDENTIFIERS =================== */
 
 Identifier "identifier"
   = i:([a-zA-Z0-9] / "-" / "_" / ".")+ {return ['Identifier', i.join('')]; }
+
+HttpHeader "HTTP Header"
+  = obj:("req" / "resp" / "obj" / "beresp") ".http." name:HttpHeaderName {return ['HttpHeader', {obj:obj, name:name}]; }
+
+HttpHeaderName "HTTP Header"
+  = i:([a-zA-Z0-9] / "-" )+ { return i.join(''); }
+
+/* =========== LITERALS ================= */
 
 Literal "literal"
   = value:(Duration / Integer / String / Boolean )
@@ -47,6 +105,9 @@ Duration "duration"
 
 Integer "integer"
   = int:[0-9]+ {return ['Integer', parseInt(int.join(''),10)]}
+
+__ "non-breaking whitespace"
+  = [ \t]*
 
 _ "whitespace"
   = [ \t\n\r]*
