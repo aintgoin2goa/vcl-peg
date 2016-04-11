@@ -35,7 +35,7 @@ start
   = block:(Block _ )+ {return block.map(e => e[0]); }
 
 Block
-  =  (BackendDefinition / Comment / Subroutine )
+  =  (BackendDefinition / Comment / Subroutine / Line )
 
 
 /* ================ BLOCKS ==================== */
@@ -61,7 +61,7 @@ Line "Line"
   = __ statements:(__ Statement __)* __ ";" {return clean(statements[0]); }
 
 Statement "Statement"
-  = statement:(GetHttpHeader / SetHttpHeader)
+  = statement:(GetHttpHeader / SetHttpHeader / GetProperty / SetProperty)
 
 GetHttpHeader "Get HTTP Header"
   = header:HttpHeader
@@ -70,7 +70,10 @@ SetHttpHeader "Set HTTP Header"
   = "set" _ left:HttpHeader _ "=" _ right:(HttpHeader / String) {return ['SetHttpHeader', {name:left, value:right}]; }
 
 GetProperty "Get Property"
-  = obj:AvailableObjects "." prop:Identifier { return ['GetProperty', {object:obj, name:prop}];}
+  = obj:AvailableObjects "." prop:Identifier { return ['GetProperty', {object:obj, name:prop[1]}];}
+
+SetProperty
+  = "set" _ obj:AvailableObjects "." prop:Identifier _ "=" _ val:(HttpHeader / Identifier / Literal) { return ['SetProperty', {object:obj, name:prop[1], value:val}];}
 
 SetBackendProperty "SET backend property"
  = left:BackendPropertyName _ "=" _ right:Literal ";" {return ['SetBackendProperty', {name:left, value:right}]; }
