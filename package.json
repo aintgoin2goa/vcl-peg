@@ -1,6 +1,6 @@
 {
   "name": "vcl-parser",
-  "version": "1.0.0-alpha2",
+  "version": "1.0.0-alpha3",
   "description": "Attempt to learn PEG",
   "main": "parser.js",
   "repository": {
