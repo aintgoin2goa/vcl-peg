@@ -7,20 +7,33 @@
 		return ['StringConcatenation', str.map(s => s[0])];
 	}
 
+	function isArray(val){
+		return val instanceof Array || typeof val === 'object' && val !== null && val.push && val.pop;
+	}
+
 	function log(val){
 		console.log(util.inspect(val, {depth:null}));
 		return val;
 	}
 
 	function clean(arr){
-		return arr.filter(a => {
-			if(typeof a === 'object' && a.push){
-				return a.length > 0;
-			}
+		console.log('CLEAN', arr);
+		if(isArray(arr)){
+			let result;
+			if(!arr.length) return false;
 
-			return !!a;
-		});
+			return arr.filter(a => {
+				if(isArray(a)){
+					return clean(a);
+				}
+
+				return !!a;
+			});
+		}else{
+			return !!arr;
+		}
 	}
+
 
 	function logEach(val){
 		for(let v of val){
@@ -35,7 +48,7 @@ start
   = block:(Block _ )+ {return block.map(e => e[0]); }
 
 Block
-  =  (BackendDefinition / Comment / Subroutine / Line )
+  =  (BackendDefinition / Comment / Subroutine / Conditional )
 
 
 /* ================ BLOCKS ==================== */
@@ -80,6 +93,20 @@ SetBackendProperty "SET backend property"
 
 BackendPropertyName "backend property name"
   = name:("." Identifier) {return name[1].join('')}
+
+
+/* ============== COMPARISONS =================== */
+
+
+Conditional "Conditional Expression"
+  = "("? _  expr:((BooleanTest _ BooleanOperator _ BooleanTest)) _  ")"? {return ['ConditionalExpression', clean(expr)]; }
+
+BooleanOperator "BooleanOperator"
+  = operator:("&&" / "||") {return ['BooleanOperator', operator]; }
+
+BooleanTest "Boolean Test"
+  = "("? _  left:(Identifier / Literal) _ operator:("==" / "!=" / "~") _ right:(Identifier / Literal) _ ")"? {return ['BooleanTest', {left:left, right:right, operator:operator}]; }
+
 
 /* ============= IDENTIFIERS =================== */
 
