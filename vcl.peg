@@ -92,7 +92,7 @@ SetBackendProperty "SET backend property"
  = left:BackendPropertyName _ "=" _ right:Literal ";" {return ['SetBackendProperty', {name:left, value:right}]; }
 
 BackendPropertyName "backend property name"
-  = name:("." Identifier) {return name[1].join('')}
+  = name:("." Identifier) {return name[1][1]; }
 
 
 /* ============== COMPARISONS =================== */
