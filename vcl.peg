@@ -125,7 +125,7 @@ HttpHeaderName "HTTP Header"
 /* =========== LITERALS ================= */
 
 Literal "literal"
-  = value:(Duration / Integer / String / Boolean )
+  = value:(Duration / Integer / Boolean / String )
 
 String "String"
   = str:((StringPart / Identifier) _? )+ {return isConcat(str);}
